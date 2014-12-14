@@ -79,6 +79,10 @@ ifeq ($(APP_ABI),armeabi)
 	CFLAGS += $(TARGET_thumb_release_CFLAGS)
 endif
 
+# these are required for android-21 and higher for all executables. I think it
+# might conflict with -fPIC, used for shared libraries, so they are split out
+PIE_CFLAGS = -fPIE
+PIE_LDFLAGS = -fPIE -pie
 
 .PHONY = clean distclean install-clean \
 	libgpg-error-build libgpg-error-clean libgpg-error-install \
@@ -483,7 +487,7 @@ gnupg/configure:
 
 gnupg/Makefile: gnupg/configure gnupg/config.sub gnupg/config.guess
 	cd gnupg && \
-		CC="$(CC)" AR="$(AR)" RANLIB=$(RANLIB) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" \
+		CC="$(CC)" AR="$(AR)" RANLIB=$(RANLIB) CFLAGS="$(CFLAGS) $(PIE_CFLAGS)" LDFLAGS="$(LDFLAGS) $(PIE_LDFLAGS)" \
 			./configure \
 				--enable-maintainer-mode \
 				--host=$(HOST) \
@@ -544,7 +548,7 @@ pinentry/configure:
 
 pinentry/Makefile: pinentry/configure pinentry/config.sub pinentry/config.guess
 	cd pinentry && \
-		CC="$(CC)" AR="$(AR)" RANLIB=$(RANLIB) CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" \
+		CC="$(CC)" AR="$(AR)" RANLIB=$(RANLIB) CFLAGS="$(CFLAGS) $(PIE_CFLAGS)" LDFLAGS="$(LDFLAGS) $(PIE_LDFLAGS)" \
 			./configure \
 				--enable-maintainer-mode \
 				--host=$(HOST) \
